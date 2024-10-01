@@ -11,10 +11,8 @@ from textnode import (
     text_type_italic,
 )
 
-from htmlnode import LeafNode
-
 props_dict1 = {"href": "https://www.google.com"}
-props_dict2 = {"src": "https://www.google.com", "alt": "image-alt-text-here"}
+url = "https://www.google.com"
 
 
 class TestTextNode(unittest.TestCase):
@@ -37,33 +35,31 @@ class TestTextNode(unittest.TestCase):
         node = TextNode("This is a text node", text_type_bold, text_type_link)
         self.assertEqual("TextNode(This is a text node, bold, link)", repr(node))
 
+    def test_eq_url(self):
+        node1 = TextNode("This is a text node", text_type_text, "https://www.boot.dev")
+        node2 = TextNode("This is a text node", text_type_text, "https://www.boot.dev")
+        self.assertEqual(node1, node2)
+
 
 class TestTextToHTML(unittest.TestCase):
     def test_test_to_leafnode(self):
         node = TextNode("This is a text node", text_type_bold)
-        print(text_node_to_html_node(node), LeafNode("b", node.text))
-        self.assertEqual(text_node_to_html_node(node), "<b>This is a text node</b>")
-
-    def test_test_to_leafnode_url(self):
-        node = TextNode(
-            "Click me!",
-            text_type_link,
-            props_dict1,
-        )
-        self.assertEqual(
-            text_node_to_html_node(node),
-            '<a href="https://www.google.com">Click me!</a>',
-        )
+        html_node = text_node_to_html_node(node)
+        self.assertEqual(html_node.tag, "b")
+        self.assertEqual(html_node.value, "This is a text node")
 
     def test_test_to_leafnode_image(self):
         node = TextNode(
-            "",
+            "This is an image",
             text_type_image,
-            props_dict2,
+            url,
         )
+        html_node = text_node_to_html_node(node)
+        self.assertEqual(html_node.tag, "img")
+        self.assertEqual(html_node.value, "")
         self.assertEqual(
-            text_node_to_html_node(node),
-            '<img src="https://www.google.com", alt="image-alt-text-here">Click me!</a>',
+            html_node.props,
+            {"src": "https://www.google.com", "alt": "This is an image"},
         )
 
 
